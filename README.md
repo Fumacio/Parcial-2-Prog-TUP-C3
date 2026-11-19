@@ -6,7 +6,7 @@ Segundo parcial de **Programación IV: Desarrollo Web**. Sistema para un comerci
 | --- | --- |
 | **Integrantes** | _Completar: nombre y legajo de los 3 integrantes_ |
 | **URL pública** | _Completar después de publicar en Vercel_ |
-| **Repositorio** | _Completar con la URL de GitHub_ |
+| **Repositorio** | <https://github.com/Fumacio/Parcial-2-Prog-TUP-C3> |
 
 ## Tecnologías
 
