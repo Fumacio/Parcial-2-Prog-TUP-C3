@@ -6,7 +6,7 @@ import { PUNTO_VENTA } from "@/lib/config";
 import { conflicto, noEncontrado, reglaNegocio } from "@/lib/errores";
 import { esquemaAnulacion, esquemaFactura } from "@/lib/esquemas";
 import { finDia, inicioDia } from "@/lib/fechas";
-import { numeroFactura } from "@/lib/formato";
+import { moneda, numeroFactura } from "@/lib/formato";
 import { exigirAdmin, paginacion, type Filtros, type Usuario } from "@/lib/tipos";
 import { validar } from "@/lib/validar";
 import { saldoCliente } from "./clientes";
@@ -289,7 +289,7 @@ export async function listarFacturas(usuario: Usuario, filtros: Filtros) {
 /**
  * RF-V9 y regla 5: anulación (solo admin, motivo obligatorio). En una transacción:
  * marca la factura, reingresa el stock y, si fue a cuenta corriente, graba un crédito.
- * La factura nunca se borra.
+ * La factura nunca se borra. Regla 8: si el crédito dejara saldo a favor, no se anula.
  */
 export async function anularFactura(usuario: Usuario, id: number, datos: unknown) {
   exigirAdmin(usuario);
@@ -298,6 +298,19 @@ export async function anularFactura(usuario: Usuario, id: number, datos: unknown
   await db.transaction(async (tx) => {
     const [f] = await tx.select().from(facturas).where(eq(facturas.id, id));
     if (!f) throw noEncontrado("La factura");
+
+    // Regla 8: no se admiten saldos a favor. Si el cliente ya pagó parte de esta factura,
+    // el crédito por el total dejaría su saldo negativo: en ese caso no se puede anular.
+    if (f.estado === "emitida" && f.formaPago === "cuenta_corriente" && f.clienteId) {
+      const saldoActual = await saldoCliente(tx, f.clienteId);
+      if (saldoActual - f.total < 0) {
+        throw reglaNegocio(
+          "SALDO_A_FAVOR",
+          `No se puede anular: el cliente ya pagó parte de esta factura y quedaría con saldo a favor de ${moneda(f.total - saldoActual)}.`,
+          { saldoActual, total: f.total },
+        );
+      }
+    }
 
     // UPDATE condicional: si otra persona ya la anuló, no modifica nada
     const [anulada] = await tx

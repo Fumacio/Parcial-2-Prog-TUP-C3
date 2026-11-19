@@ -43,6 +43,8 @@ En [`src/lib/api.ts`](../src/lib/api.ts). Para cada pedido:
 
 Criterio: `409` cuando el pedido choca con el estado de los datos (código repetido, sin stock); `422` cuando está bien formado pero rompe una regla de negocio.
 
+Además de los códigos de la sección 11.8 del enunciado, se agregó uno: `422 SALDO_A_FAVOR`, en `POST /api/facturas/{id}/anulacion`. Aparece cuando la factura fue a cuenta corriente, el cliente ya pagó parte y el crédito lo dejaría con saldo a favor (regla 8). `details` trae `saldoActual` y `total`.
+
 ## Los 31 endpoints
 
 | Método | Ruta | Rol | Servicio |
@@ -99,7 +101,7 @@ Con la app levantada (`pnpm run dev`), en otra terminal:
 pnpm run probar:api
 ```
 
-Corre 46 pruebas: sin sesión → 401, vendedor en ruta de admin → 403, código duplicado → 409, `existencia` en un PATCH → 422, número de tarjeta completo → 422, dos ventas simultáneas de la última unidad, límite de crédito, pago mayor que la deuda, anulación, usuario desactivado con sesión abierta, etc.
+Corre 50 pruebas: sin sesión → 401, vendedor en ruta de admin → 403, código duplicado → 409, `existencia` en un PATCH → 422, número de tarjeta completo → 422, dos ventas simultáneas de la última unidad, límite de crédito, pago mayor que la deuda, anulación (y su rechazo si dejaría saldo a favor), usuario desactivado con sesión abierta, etc.
 
 > El script crea datos (producto `TEST-1`, "Cliente Prueba"). Después se puede volver a los datos iniciales borrando `local.db` y corriendo `db:migrate` y `db:seed`.
 

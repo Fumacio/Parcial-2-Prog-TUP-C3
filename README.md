@@ -73,7 +73,7 @@ Los datos iniciales cargan 2 usuarios, 5 categorías, 30 productos, 10 clientes,
 | `pnpm run db:migrate` | Aplica las migraciones a la base de `DATABASE_URL` |
 | `pnpm run db:seed` | Carga los datos de prueba (solo si la base está vacía) |
 | `pnpm run db:verificar` | Comprueba que el stock cuadre con sus movimientos y los saldos con la cuenta corriente |
-| `pnpm run probar:api` | Corre 46 pruebas contra la API (con la app levantada en el puerto 3000) |
+| `pnpm run probar:api` | Corre 50 pruebas contra la API (con la app levantada en el puerto 3000) |
 | `pnpm run db:studio` | Abre Drizzle Studio para ver las tablas |
 
 ## Estructura

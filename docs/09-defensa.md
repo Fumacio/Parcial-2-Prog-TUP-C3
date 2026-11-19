@@ -13,7 +13,9 @@ Entrar como administrador (`laura@ferreteria.test` / `admin1234`).
 1. **Venta a consumidor final en efectivo.** Antes, abrir un producto (por ejemplo `HE-001`) y anotar la existencia. Ir a Ventas → Nueva venta, buscar "martillo", Enter, poner un monto recibido mayor y mostrar el vuelto. `F9`. Volver al producto: la existencia bajó y hay un movimiento "Venta 0001-…".
 2. **Venta a un cliente nuevo en cuenta corriente.** Nueva venta → botón "Nuevo" en Comprador → cargar DNI, nombre, marcar "Habilitado para cuenta corriente" y un límite. Agregar productos, elegir "Cta. cte." y confirmar. Ir a la ficha del cliente: saldo = total de la factura; pestaña Cuenta corriente con el débito.
 3. **Pago de ese cliente.** En la ficha: "Registrar pago" por una parte del saldo → se abre el recibo `R 0001-…`. Volver a la ficha: el saldo bajó; en la cuenta corriente aparece el crédito.
-4. **Anulación de una factura.** Abrir la factura del paso 2 → "Anular" → motivo. Revisar: estado "Anulada", el stock volvió (movimiento "Anulación"), y en la cuenta del cliente hay un crédito por el total.
+4. **Anulación de una factura.** Abrir la factura del paso 1 (contado) → "Anular" → motivo. Revisar: estado "Anulada" con quién, cuándo y por qué, y el stock volvió (movimiento "Anulación").
+   - Si piden anular la factura **a cuenta del paso 2**, que ya se pagó en parte, el sistema la **rechaza** con el mensaje *"quedaría con saldo a favor"*. Es la regla 8: no se admiten saldos a favor. Explicarlo y mostrar `anularFactura` en `src/servicios/facturas.ts`.
+   - Para mostrar el crédito en la cuenta corriente: hacer otra venta a cuenta al mismo cliente y anularla **sin pagarla**. Se reingresa el stock y aparece un crédito por el total.
 
 Extras rápidos si sobra tiempo: entrar como vendedor y mostrar que no ve "Usuarios" ni "Anular"; correr `pnpm run db:verificar`.
 
@@ -63,7 +65,7 @@ Extras rápidos si sobra tiempo: entrar como vendedor y mostrar que no ve "Usuar
 | ¿Dónde se impide vender a cuenta a consumidor final? | Paso 2 de `crearFactura` |
 | ¿Dónde se controla el límite de crédito? | Paso 5 de `crearFactura` |
 | ¿Dónde se impide un pago mayor que la deuda? | `registrarPago` en `src/servicios/pagos.ts` |
-| ¿Qué hace el sistema al anular? | `anularFactura`: marca anulada, reingresa stock con movimientos de anulación y, si fue a cuenta, graba un crédito. No borra la factura |
+| ¿Qué hace el sistema al anular? | `anularFactura`: marca anulada, reingresa stock con movimientos de anulación y, si fue a cuenta, graba un crédito por el total. No borra la factura. Si el cliente ya pagó parte de esa factura, el crédito lo dejaría con saldo a favor (regla 8), así que responde `422 SALDO_A_FAVOR` y no cambia nada |
 | ¿Dónde queda registrado cada movimiento de stock? | Tabla `movimientos_stock`, que graba `moverStock` |
 
 ### Seguridad y permisos

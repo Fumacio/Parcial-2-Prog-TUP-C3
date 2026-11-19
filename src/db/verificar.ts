@@ -2,7 +2,7 @@
 // Lista de control 10.8, punto 5:
 //  - la existencia de cada producto coincide con la suma de sus movimientos
 //  - el saldo de cada cliente es débitos − créditos (se calcula siempre de los movimientos,
-//    así que no puede descuadrar; acá se muestran los que quedaron con saldo a favor)
+//    así que no puede descuadrar; además ningún saldo debería quedar negativo: regla 8)
 import "dotenv/config";
 import { eq, sql } from "drizzle-orm";
 import { db } from "./index";
@@ -50,7 +50,7 @@ async function main() {
       console.log(`✘ ${c.nombre}: la app muestra ${mostrado} pero los movimientos suman ${c.saldo}`);
       errores++;
     }
-    // Puede pasar si se anula una factura que el cliente ya había pagado: queda a favor.
+    // No debería pasar: anularFactura rechaza la anulación que dejaría saldo a favor (regla 8).
     if (Number(c.saldo) < 0) console.log(`⚠ ${c.nombre}: saldo a favor de ${-c.saldo} centavos`);
   }
   console.log(`Clientes revisados: ${saldos.length}`);

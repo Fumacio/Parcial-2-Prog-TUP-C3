@@ -108,6 +108,18 @@ Se extrajeron las 30 capturas de `pantallas.html` y se compararon con cada panta
 **Problema:** al probar `F4` en el navegador, el texto escrito después quedaba en el buscador de productos: el foco se movía con un pequeño retraso.
 **Solución:** si el buscador de clientes ya está en pantalla, se enfoca en el momento; el retraso solo se usa cuando hay que quitar un cliente elegido.
 
+## Paso 12: publicación y prueba en línea
+
+- Se creó el repositorio en GitHub, la base en Turso (`sistema-comercial`, Virginia) y el proyecto en Vercel con `scripts/publicar.ps1`.
+- **Problema:** la primera vez la migración en Turso falló. El token se había pegado cortado en la terminal (59 caracteres de unos 350).
+  **Solución:** el script lee el token directo del portapapeles y prueba la conexión antes de migrar (`scripts/probar-conexion.mjs`).
+- Se hizo el recorrido de la defensa sobre la URL pública: venta de contado, cliente nuevo con venta a cuenta, pago y anulación. Stock y saldo bien en cada paso.
+
+## Paso 13: anulación que dejaba saldo a favor
+
+**Problema encontrado en la revisión:** si se vendía a cuenta, el cliente pagaba una parte y después se anulaba esa factura, el crédito por el total dejaba el saldo negativo (a favor del cliente). La regla 8 dice que no se admiten saldos a favor, y es justo el recorrido de la demo de la defensa.
+**Solución:** `anularFactura` calcula el saldo antes de anular. Si el crédito lo dejaría negativo, responde `422 SALDO_A_FAVOR` con un mensaje claro y no modifica nada. Se agregaron pruebas: el rechazo, que el saldo no cambie y una anulación válida de otra factura a cuenta impaga.
+
 ## Estado final
 
 | Verificación | Resultado |
@@ -116,6 +128,6 @@ Se extrajeron las 30 capturas de `pantallas.html` y se compararon con cada panta
 | `pnpm lint` | Sin errores (1 aviso aceptado en `lib/cliente-api.ts`) |
 | `pnpm build` | Compila |
 | `pnpm run db:verificar` | Todo cuadra |
-| `pnpm run probar:api` | 46 de 46 |
+| `pnpm run probar:api` | 50 de 50 |
 
-Falta (lo hace el grupo): crear el repositorio en GitHub, publicar en Vercel y Turso, completar el README y probar en línea. Ver [08-publicacion.md](08-publicacion.md).
+Publicado en <https://parcial-2-prog-tup-c3.vercel.app> con la base en Turso. Falta (lo hace el grupo): mandar los links por WhatsApp y preparar la defensa con [09-defensa.md](09-defensa.md).

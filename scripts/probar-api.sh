@@ -71,10 +71,17 @@ check "Saldo después del pago" "$PR" "$(campo saldoCliente)"
 s=$(pedir PATCH /api/clientes/$C "$V" '{"activo":false}'); check "Baja con saldo" "SALDO_PENDIENTE" "$(codigo)"
 s=$(pedir POST /api/facturas/$F/anulacion "$V" '{"motivo":"x"}'); check "Vendedor anula -> 403" 403 "$s"
 s=$(pedir POST /api/facturas/$F/anulacion "$A" '{}'); check "Anulación sin motivo -> 422" 422 "$s"
-s=$(pedir POST /api/facturas/$F/anulacion "$A" '{"motivo":"Prueba"}'); check "Anulación" 200 "$s"
-s=$(pedir POST /api/facturas/$F/anulacion "$A" '{"motivo":"Prueba"}'); check "Anular dos veces -> 409" 409 "$s"
-s=$(pedir GET /api/productos/2 "$A"); check "Stock reingresado" "$E0" "$(campo existencia)"
-s=$(pedir GET /api/clientes/$C/cuenta "$A"); check "Movimientos de cuenta" 3 "$(campo movimientos.length)"
+# La factura F ya se pagó en parte: anularla dejaría saldo a favor (regla 8)
+s=$(pedir POST /api/facturas/$F/anulacion "$A" '{"motivo":"Prueba"}'); check "Anular factura pagada en parte" "SALDO_A_FAVOR" "$(codigo)"
+s=$(pedir GET /api/clientes/$C "$A"); check "Saldo sin cambios tras el rechazo" "$PR" "$(campo saldo)"
+# Otra venta a cuenta, todavía impaga: esa sí se puede anular
+s=$(pedir POST /api/facturas "$V" "{\"clienteId\":$C,\"items\":[{\"productoId\":2,\"cantidad\":1}],\"pago\":{\"forma\":\"cuenta_corriente\"}}"); check "Segunda venta en cta cte" 201 "$s"
+F2=$(campo id)
+s=$(pedir POST /api/facturas/$F2/anulacion "$A" '{"motivo":"Prueba"}'); check "Anulación" 200 "$s"
+check "Saldo vuelve a lo adeudado" "$PR" "$(campo saldoCliente)"
+s=$(pedir POST /api/facturas/$F2/anulacion "$A" '{"motivo":"Prueba"}'); check "Anular dos veces -> 409" 409 "$s"
+s=$(pedir GET /api/productos/2 "$A"); check "Stock reingresado" "$((E0-2))" "$(campo existencia)"
+s=$(pedir GET /api/clientes/$C/cuenta "$A"); check "Movimientos de cuenta" 4 "$(campo movimientos.length)"
 
 s=$(pedir GET /api/tablero "$V"); check "Tablero: 30 días" 30 "$(campo ventasDiarias.length)"
 s=$(pedir GET "/api/facturas?pageSize=5" "$V"); check "Listado facturas paginado" 5 "$(campo data.length)"

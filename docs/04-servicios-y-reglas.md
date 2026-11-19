@@ -93,7 +93,9 @@ Porque cualquiera puede llamar a la API a mano y mandar el precio que quiera. El
 
 La factura nunca se borra: queda visible con el estado "Anulada", quién la anuló, cuándo y por qué.
 
-> Caso a tener en cuenta: si se anula una factura a cuenta que el cliente **ya pagó**, el crédito deja el saldo negativo (a favor del cliente). El enunciado pide el crédito por el total, así que se respeta. `db:verificar` lo muestra como aviso.
+**Factura a cuenta ya pagada en parte.** Antes de anular, si la factura fue a cuenta corriente, se calcula el saldo del cliente. Si el crédito por el total lo dejaría **negativo** (saldo a favor del cliente, que la regla 8 no admite), la anulación se rechaza con `422 SALDO_A_FAVOR` y no se modifica nada.
+
+Ejemplo: factura de $ 12.500 a cuenta, el cliente pagó $ 5.000 y debe $ 7.500. Anularla acreditaría $ 12.500 y lo dejaría en −$ 5.000, así que se rechaza. Si en cambio se anula antes del pago, o hay otras deudas que cubren el total, se anula normalmente.
 
 ## Cuenta corriente y pagos
 
@@ -113,6 +115,7 @@ La factura nunca se borra: queda visible con el estado "Anulada", quién la anul
 | Consumidor final sin cuenta corriente | `servicios/facturas.ts` → `crearFactura`, paso 2 |
 | Límite de crédito | `servicios/facturas.ts` → `crearFactura`, paso 5 |
 | Pago no supera la deuda | `servicios/pagos.ts` → `registrarPago` |
+| Anulación no deja saldo a favor | `servicios/facturas.ts` → `anularFactura` |
 | Datos de tarjeta | `lib/esquemas.ts` → `esquemaTarjeta` |
 | Existencia no editable | `lib/esquemas.ts` → `esquemaProductoEdicion` (no tiene el campo y es estricto) |
 | Bajas lógicas | `editarProducto`, `editarCliente`, `editarUsuario`, `editarCategoria` |

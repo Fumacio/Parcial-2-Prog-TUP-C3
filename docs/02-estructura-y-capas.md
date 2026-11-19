@@ -55,7 +55,7 @@ sistema-comercial/
 ├── drizzle.config.ts         Configuración de drizzle-kit (local o Turso según la URL)
 ├── next.config.ts            Configuración de Next.js
 ├── drizzle/                  Migraciones SQL generadas por drizzle-kit
-├── scripts/probar-api.sh     46 pruebas automáticas de la API
+├── scripts/probar-api.sh     50 pruebas automáticas de la API
 ├── docs/                     Esta documentación
 └── src/
     ├── proxy.ts              Barrera 1: sin cookie → /login
