@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de gestión comercial
 
-## Getting Started
+Segundo parcial de **Programación IV: Desarrollo Web**. Sistema para un comercio minorista de un solo local: **facturación**, **control de stock** y **cuenta corriente de clientes**, con usuarios, roles y un tablero de inicio con gráficos.
 
-First, run the development server:
+| | |
+| --- | --- |
+| **Integrantes** | _Completar: nombre y legajo de los 3 integrantes_ |
+| **URL pública** | _Completar después de publicar en Vercel_ |
+| **Repositorio** | _Completar con la URL de GitHub_ |
+
+## Tecnologías
+
+| Capa | Tecnología |
+| --- | --- |
+| Lenguaje | TypeScript |
+| Framework | Next.js 16 (App Router, enrutamiento por archivos) |
+| API | REST con Route Handlers (`src/app/api/**/route.ts`) |
+| Interfaz | React 19, shadcn/ui y Tailwind CSS 4 |
+| Gráficos | Chart.js con `react-chartjs-2` |
+| Base de datos | SQLite en desarrollo, Turso (libSQL) en producción |
+| Acceso a datos | Drizzle ORM y migraciones con `drizzle-kit` |
+| Validación | Zod, con los mismos esquemas en el formulario y en el servidor |
+| Sesión | Propia, en una cookie `httpOnly` firmada con HMAC. Contraseñas con bcrypt |
+| Hosting | Vercel (app) y Turso (base de datos) |
+
+## Instalación local
+
+Hace falta Node.js 20 o superior y pnpm (`npm install -g pnpm`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env
+pnpm run db:migrate
+pnpm run db:seed
+pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Después se abre <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> En Windows con PowerShell, el segundo paso es `Copy-Item .env.example .env`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Para empezar de cero con la base local
 
-## Learn More
+Borrar el archivo `local.db` y volver a correr `pnpm run db:migrate` y `pnpm run db:seed`.
 
-To learn more about Next.js, take a look at the following resources:
+## Variables de entorno
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Están en el archivo [`.env.example`](.env.example).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Local | Producción (Vercel) |
+| --- | --- | --- |
+| `DATABASE_URL` | `file:local.db` | `libsql://<base>-<usuario>.turso.io` |
+| `DATABASE_AUTH_TOKEN` | vacío | token de Turso (`turso db tokens create <base>`) |
+| `SESSION_SECRET` | cualquier texto de 32 caracteres o más | texto aleatorio largo, distinto del de local |
 
-## Deploy on Vercel
+## Usuarios de prueba
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Rol | Email | Contraseña |
+| --- | --- | --- |
+| Administrador | `laura@ferreteria.test` | `admin1234` |
+| Vendedor | `pablo@ferreteria.test` | `vendedor1234` |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Los datos iniciales cargan 2 usuarios, 5 categorías, 30 productos, 10 clientes, 50 facturas de los últimos 30 días, 4 pagos y 1 anulación.
+
+## Scripts
+
+| Comando | Qué hace |
+| --- | --- |
+| `pnpm run dev` | Levanta la app en modo desarrollo |
+| `pnpm run build` / `pnpm start` | Compila y levanta la versión de producción |
+| `pnpm run db:generate` | Crea una migración nueva después de cambiar `src/db/schema.ts` |
+| `pnpm run db:migrate` | Aplica las migraciones a la base de `DATABASE_URL` |
+| `pnpm run db:seed` | Carga los datos de prueba (solo si la base está vacía) |
+| `pnpm run db:verificar` | Comprueba que el stock cuadre con sus movimientos y los saldos con la cuenta corriente |
+| `pnpm run probar:api` | Corre 46 pruebas contra la API (con la app levantada en el puerto 3000) |
+| `pnpm run db:studio` | Abre Drizzle Studio para ver las tablas |
+
+## Estructura
+
+```text
+src/
+├── app/                 Páginas y API (App Router)
+│   ├── (sistema)/       Pantallas con panel lateral (requieren sesión)
+│   ├── login/           Única página pública
+│   └── api/             API REST: 31 endpoints en 23 archivos route.ts
+├── servicios/           Reglas de negocio (una carpeta, un módulo por tema)
+├── db/                  Esquema, conexión, datos iniciales y verificación
+├── lib/                 Sesión, errores, esquemas Zod, formatos y ayudas
+├── components/          Componentes de interfaz (ui = shadcn, comunes, por módulo)
+├── hooks/               Hook de formularios
+└── proxy.ts             Primera barrera: redirige al login si no hay cookie
+drizzle/                 Migraciones SQL generadas
+docs/                    Documentación paso a paso
+scripts/                 Pruebas de la API
+```
+
+## Documentación
+
+La carpeta [`docs/`](docs) explica cada parte del sistema:
+
+1. [Plan y requisitos del parcial](docs/01-plan-y-requisitos.md)
+2. [Estructura de carpetas y capas](docs/02-estructura-y-capas.md)
+3. [Base de datos y migraciones](docs/03-base-de-datos.md)
+4. [Servicios y reglas de negocio](docs/04-servicios-y-reglas.md)
+5. [Sesión, seguridad y permisos](docs/05-sesion-y-permisos.md)
+6. [API REST](docs/06-api-rest.md)
+7. [Pantallas](docs/07-pantallas.md)
+8. [Publicación en Vercel y Turso](docs/08-publicacion.md)
+9. [Guía para la defensa](docs/09-defensa.md)
+10. [Bitácora de desarrollo](docs/10-bitacora.md)
+
+## Requerimientos cumplidos
+
+Cada función de `src/servicios/` tiene un comentario con el requerimiento (RF-…) o la regla que implementa. La tabla completa está en [docs/01-plan-y-requisitos.md](docs/01-plan-y-requisitos.md).
