@@ -4,7 +4,8 @@ Segundo parcial de **Programación IV: Desarrollo Web**. Sistema para un comerci
 
 | | |
 | --- | --- |
-| **Integrantes** | _Completar: nombre y legajo de los 3 integrantes_ |
+| **Grupo** | 22 |
+| **Integrantes** | Pablo Ignacio Flores (63586) · Lourdes Micaela Andrada Romero (63624) · Valentín González Patti (61595) |
 | **URL pública** | _Completar después de publicar en Vercel_ |
 | **Repositorio** | <https://github.com/Fumacio/Parcial-2-Prog-TUP-C3> |
 
