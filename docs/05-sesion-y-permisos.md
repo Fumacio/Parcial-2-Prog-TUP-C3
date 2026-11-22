@@ -45,6 +45,15 @@ El `403` lo da `exigirAdmin` dentro del servicio, antes de validar o tocar la ba
 
 En cada pedido, `usuarioActual()` busca al usuario **en la base** (`usuarioDeSesion` en `servicios/auth.ts`). Si está inactivo, devuelve `null`: el siguiente pedido a la API da `401` y la siguiente página lo manda a `/login`, aunque todavía tenga la cookie. Lo mismo con el rol: si le cambian el rol, el cambio rige en el siguiente pedido.
 
+## Botones de modo demo
+
+El login tiene dos botones, **Administrador** y **Vendedor**, para entrar sin escribir usuario ni contraseña ([`components/auth/formulario-login.tsx`](../src/components/auth/formulario-login.tsx)).
+
+- **No es un acceso especial:** los botones mandan el email y la contraseña de los usuarios de prueba al mismo `POST /api/auth/login` que el formulario. El servidor los valida igual que siempre (bcrypt, usuario activo, cookie firmada).
+- Los datos de esos usuarios están en un solo lugar, `USUARIOS_DEMO` en [`lib/config.ts`](../src/lib/config.ts), que usa también el script de datos iniciales.
+- **Si se cambia la contraseña** de un usuario de prueba desde `/perfil`, o se lo desactiva, su botón deja de funcionar y muestra "Email o contraseña incorrectos.".
+- Son contraseñas de prueba, ya publicadas en el README. En un sistema real no habría botones así.
+
 ## Contraseñas
 
 - Se guardan con **bcrypt** (`hashear` en `servicios/auth.ts`, costo 10). El hash no se puede revertir; para comprobar una contraseña se usa `bcrypt.compare`.

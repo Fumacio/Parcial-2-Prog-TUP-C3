@@ -120,6 +120,10 @@ Se extrajeron las 30 capturas de `pantallas.html` y se compararon con cada panta
 **Problema encontrado en la revisión:** si se vendía a cuenta, el cliente pagaba una parte y después se anulaba esa factura, el crédito por el total dejaba el saldo negativo (a favor del cliente). La regla 8 dice que no se admiten saldos a favor, y es justo el recorrido de la demo de la defensa.
 **Solución:** `anularFactura` calcula el saldo antes de anular. Si el crédito lo dejaría negativo, responde `422 SALDO_A_FAVOR` con un mensaje claro y no modifica nada. Se agregaron pruebas: el rechazo, que el saldo no cambie y una anulación válida de otra factura a cuenta impaga.
 
+## Paso 14: botones de modo demo en el login
+
+Se agregaron dos botones, **Administrador** y **Vendedor**, para entrar sin escribir usuario ni contraseña. Se eligió que manden los datos de los usuarios de prueba al login normal, en lugar de crear una ruta especial en el servidor: así no hay ningún acceso nuevo que proteger y los permisos funcionan igual. Los usuarios de prueba pasaron a una constante única (`USUARIOS_DEMO` en `lib/config.ts`) que usan el login y el seed.
+
 ## Estado final
 
 | Verificación | Resultado |

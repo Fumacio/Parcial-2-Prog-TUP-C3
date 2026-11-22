@@ -16,6 +16,7 @@ import { crearCliente, saldoCliente } from "@/servicios/clientes";
 import { anularFactura, crearFactura } from "@/servicios/facturas";
 import { registrarPago } from "@/servicios/pagos";
 import { ApiError } from "@/lib/errores";
+import { USUARIOS_DEMO } from "@/lib/config";
 
 // Números "al azar" pero siempre iguales en cada corrida (así los datos son reproducibles)
 let semilla = 42;
@@ -38,19 +39,19 @@ async function main() {
   const [adminFila] = await db
     .insert(usuarios)
     .values({
-      nombre: "Laura Méndez",
-      email: "laura@ferreteria.test",
+      nombre: USUARIOS_DEMO.admin.nombre,
+      email: USUARIOS_DEMO.admin.email,
       rol: "admin",
-      passwordHash: await hashear("admin1234"),
+      passwordHash: await hashear(USUARIOS_DEMO.admin.password),
     })
     .returning();
   const admin = usuarioPublico(adminFila);
 
   const vendedorFila = await crearUsuario(admin, {
-    nombre: "Pablo Ruiz",
-    email: "pablo@ferreteria.test",
+    nombre: USUARIOS_DEMO.vendedor.nombre,
+    email: USUARIOS_DEMO.vendedor.email,
     rol: "vendedor",
-    password: "vendedor1234",
+    password: USUARIOS_DEMO.vendedor.password,
   });
   const vendedor = { ...vendedorFila, rol: "vendedor" as const };
   console.log("✔ 2 usuarios");

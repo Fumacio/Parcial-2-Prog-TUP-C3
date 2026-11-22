@@ -61,6 +61,8 @@ Están en el archivo [`.env.example`](.env.example).
 | Administrador | `laura@ferreteria.test` | `admin1234` |
 | Vendedor | `pablo@ferreteria.test` | `vendedor1234` |
 
+**Modo demo:** en el login hay dos botones, **Administrador** y **Vendedor**, que entran con estos usuarios sin escribir nada.
+
 Los datos iniciales cargan 2 usuarios, 5 categorías, 30 productos, 10 clientes, 50 facturas de los últimos 30 días, 4 pagos y 1 anulación.
 
 ## Scripts

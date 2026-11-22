@@ -4,7 +4,7 @@
 
 | URL | Archivo | Rol |
 | --- | --- | --- |
-| `/login` | `app/login/page.tsx` | Público |
+| `/login` | `app/login/page.tsx` | Público. Tiene botones de modo demo (Administrador / Vendedor) |
 | `/` | `app/(sistema)/page.tsx` | Ambos: tablero |
 | `/ventas` | `app/(sistema)/ventas/page.tsx` | Ambos: listado de facturas |
 | `/ventas/nueva` | `app/(sistema)/ventas/nueva/page.tsx` | Ambos: nueva venta |
